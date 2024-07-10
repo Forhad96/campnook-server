@@ -14,18 +14,8 @@ const zCreateProductSchema = z.object({
   }),
 });
 
-// Example usage:
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const productData = {
-  name: 'Sample Product',
-  description: 'This is a sample product',
-  price: 100,
-  category: 'Sample Category',
-  stock: 10,
-  ratings: 4.5,
-  images: ['https://example.com/image1.jpg', 'https://example.com/image2.jpg'],
-};
 
-export const ProductValidation = {
+
+export const ProductValidations = {
   zCreateProductSchema,
 };
