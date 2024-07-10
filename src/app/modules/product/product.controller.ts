@@ -27,7 +27,16 @@ const handelSingleProduct = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'SingleProduct Retrieves successfully',
+    message: 'Single Product Retrieves successfully',
+    data: result,
+  });
+});
+const handelUpdateProduct = catchAsync(async (req, res) => {
+  const result = await ProductServices.updateProduct(req.params.productId, req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Update Product successful',
     data: result,
   });
 });
@@ -36,4 +45,5 @@ export const ProductControllers = {
   handelCreateProduct,
   handelGetAllProduct,
   handelSingleProduct,
+  handelUpdateProduct
 };
