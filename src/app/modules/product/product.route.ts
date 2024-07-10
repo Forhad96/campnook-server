@@ -7,5 +7,6 @@ const router = Router();
 
 router.post('/', validateRequest(ProductValidations.zCreateProductSchema), ProductControllers.handelCreateProduct);
 router.get('/',ProductControllers.handelGetAllProduct);
+router.get('/:productId',ProductControllers.handelSingleProduct);
 
 export const ProductRoutes = router;
