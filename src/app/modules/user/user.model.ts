@@ -4,11 +4,6 @@ import config from '../../config';
 import { TUser, UserStaticModel } from '../user/user.interface';
 const userSchema = new Schema<TUser, UserStaticModel>(
   {
-    id: {
-      type: String,
-      required: true,
-      unique:true,
-    },
     email: {
       type: String,
       required: true,
@@ -28,7 +23,8 @@ const userSchema = new Schema<TUser, UserStaticModel>(
     },
     role: {
       type: String,
-      enum: ['superAdmin','student', 'faculty', 'admin'],
+      enum: ['superAdmin', 'admin',"user"],
+      default:"user"
     },
     status: {
       type: String,

@@ -2,12 +2,11 @@ import { Model } from 'mongoose';
 import { USER_ROLES } from './user.constant';
 
 export interface TUser {
-  id: string;
   email: string;
   password: string;
   needsPasswordChange: boolean;
   passwordChangedAt: Date;
-  role: 'superAdmin' | 'admin' | 'student' | 'faculty';
+  role: 'superAdmin' | 'admin' | 'user';
   status: 'in-progress' | 'blocked';
   isDeleted: boolean;
 }
