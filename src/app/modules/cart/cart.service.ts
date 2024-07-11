@@ -93,7 +93,93 @@ const addToCart = async (userId: string, item: ICartItem) => {
   }
 };
 
+const updateCartItem = async (userId: string, item: ICartItem) => {
+  const { product: productId, quantity } = item;
 
+  // Validate positive quantity
+  if (quantity <= 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Quantity must be greater than zero.',
+    );
+  }
+
+  // Start a session for transaction
+  const session = await startSession();
+  session.startTransaction();
+
+  try {
+    // Validate user existence
+    const user = await UserModel.findById(userId).session(session);
+    if (!user) {
+      throw new AppError(
+        httpStatus.NOT_FOUND,
+        'User not found. Please register or log in.',
+      );
+    }
+
+    // Validate product existence
+    const product = await ProductModel.findById(productId).session(session);
+    if (!product) {
+      throw new AppError(
+        httpStatus.NOT_FOUND,
+        'Product not found. Please check the product ID.',
+      );
+    }
+
+    // Validate product stock availability
+    if (product.stock < quantity) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Product stock is not sufficient for the requested quantity.',
+      );
+    }
+
+    // Retrieve user's cart
+    const cart = await CartModel.findOne({ user: userId }).session(session);
+    if (!cart) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Cart not found for the user.');
+    }
+
+    // Find existing cart item
+    const existingCartItem = cart.items.find(
+      item => item.product.toString() === productId.toString(),
+    );
+
+    if (!existingCartItem) {
+      throw new AppError(
+        httpStatus.NOT_FOUND,
+        'Product not found in the cart.',
+      );
+    }
+
+    // Validate stock for updated quantity
+    const stockDifference = quantity - existingCartItem.quantity;
+    if (stockDifference > 0 && stockDifference > product.stock) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Cannot update quantity. Stock limit reached.',
+      );
+    }
+
+    // Update existing item quantity
+    existingCartItem.quantity = quantity;
+
+    // Save updated cart
+    await cart.save({ session });
+
+    // Commit transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    return cart;
+  } catch (error) {
+    // Rollback transaction in case of error
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
+};
 const getUserCart = async (userId: string) => {
   const cart = await CartModel.findOne({ user: userId }).populate(
     'items.product',
@@ -105,8 +191,68 @@ const getUserCart = async (userId: string) => {
 
   return cart;
 };
+const deleteCartItem = async (userId: string, productId: string) => {
+  // Start a session for transaction
+  const session = await startSession();
+  session.startTransaction();
+  try {
+    // Validate user existence
+    const user = await UserModel.findById(userId).session(session);
+    if (!user) {
+      throw new AppError(
+        httpStatus.NOT_FOUND,
+        'User not found. Please register or log in.',
+      );
+    }
 
+    // Validate product existence
+    const product = await ProductModel.findById(productId).session(session);
+    if (!product) {
+      throw new AppError(
+        httpStatus.NOT_FOUND,
+        'Product not found. Please check the product ID.',
+      );
+    }
+
+    // Retrieve user's cart
+    const cart = await CartModel.findOne({ user: userId }).session(session);
+    if (!cart) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Cart not found for the user.');
+    }
+
+    // Find existing cart item
+    const existingCartItemIndex = cart.items.findIndex(
+      item => item.product.toString() === productId.toString(),
+    );
+
+    if (existingCartItemIndex === -1) {
+      throw new AppError(
+        httpStatus.NOT_FOUND,
+        'Product not found in the cart.',
+      );
+    }
+
+    // Remove item from cart
+    cart.items.splice(existingCartItemIndex, 1);
+
+    // Save updated cart
+    await cart.save({ session });
+
+    // Commit transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    return cart;
+  } catch (error) {
+    // Rollback transaction in case of error
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
+};
 export const CartServices = {
   addToCart,
   getUserCart,
+  updateCartItem,
+  deleteCartItem,
 };
