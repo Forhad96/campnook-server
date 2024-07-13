@@ -6,9 +6,8 @@ import { UserModel } from '../user/user.model';
 import { ProductModel } from '../product/product.module';
 import { startSession } from 'mongoose';
 
-const addToCart = async (userId: string, item: ICartItem) => {
+const addToCart = async (email: string, item: ICartItem) => {
   const { product: productId, quantity } = item;
-
   // Validate positive quantity
   if (quantity <= 0) {
     throw new AppError(
@@ -23,7 +22,7 @@ const addToCart = async (userId: string, item: ICartItem) => {
 
   try {
     // Validate user existence
-    const user = await UserModel.findById(userId).session(session);
+    const user = await UserModel.findOne({ email }).session(session);
     if (!user) {
       throw new AppError(
         httpStatus.NOT_FOUND,
@@ -47,7 +46,7 @@ const addToCart = async (userId: string, item: ICartItem) => {
         'Product stock is not sufficient for the requested quantity.',
       );
     }
-
+    const userId = user?._id;
     // Retrieve or create cart for user
     let cart = await CartModel.findOne({ user: userId }).session(session);
     if (!cart) {
@@ -180,7 +179,16 @@ const updateCartItem = async (userId: string, item: ICartItem) => {
     throw error;
   }
 };
-const getUserCart = async (userId: string) => {
+const getUserCart = async (email: string) => {
+  // Validate user existence
+  const user = await UserModel.findOne({ email });
+  if (!user) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      'User not found. Please register or log in.',
+    );
+  }
+  const userId = user._id;
   const cart = await CartModel.findOne({ user: userId }).populate(
     'items.product',
   );

@@ -4,8 +4,8 @@ import { CartServices } from './cart.service';
 import catchAsync from '../../utils/cathAsync';
 
 const handleAddToCart = catchAsync(async (req, res) => {
-  const { user: userId, product, quantity } = req.body;
-  const result = await CartServices.addToCart(userId, { product, quantity });
+  const { user:email, product, quantity } = req.body;
+  const result = await CartServices.addToCart(email, { product, quantity });
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -37,7 +37,7 @@ const handleDeleteCartItem = catchAsync(async (req, res) => {
 });
 
 const handelGetUserCart = catchAsync(async (req, res) => {
-  const result = await CartServices.getUserCart(req.params.userId);
+  const result = await CartServices.getUserCart(req.params.email);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
