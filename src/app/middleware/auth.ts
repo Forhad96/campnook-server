@@ -22,10 +22,10 @@ const auth = (...requiredUserRoles: TUserRoles[]) => {
       config.jwt_access_secret as string,
     ) as JwtPayload;
 
-    const {userId,role,iat} = decoded;
+    const {email,role,iat} = decoded;
 
     // checking if the user is exist
-    const user = await UserModel.isUserExisTByCustomId(userId);
+    const user = await UserModel.isUserExistByEmail(email);
     if (!user) {
       throw new AppError(httpStatus.NOT_FOUND, 'This user is not exist');
     }

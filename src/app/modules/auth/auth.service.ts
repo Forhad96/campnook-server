@@ -11,7 +11,7 @@ import { sendEmail } from '../../utils/sendEmail';
 
 const loginUser = async (payload: TLoginUser) => {
   // checking if the user is exist
-  const user = await UserModel.isUserExisTByCustomId(payload?.id);
+  const user = await UserModel.isUserExistByEmail(payload?.email);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not exist');
   }
@@ -38,7 +38,7 @@ const loginUser = async (payload: TLoginUser) => {
   //create token send to the client
 
   const jwtPayload = {
-    userId: user?.id,
+    email: user?.email,
     role: user?.role,
   };
 
@@ -63,10 +63,10 @@ const changePassword = async (
   userData: JwtPayload,
   payload: { oldPassword: string; newPassword: string },
 ) => {
-  const { userId, role } = userData;
+  const { email, role } = userData;
 
   // checking if the user is exist
-  const user = await UserModel.isUserExisTByCustomId(userId);
+  const user = await UserModel.isUserExistByEmail(email);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not exist');
   }
@@ -98,7 +98,7 @@ const changePassword = async (
 
   await UserModel.findOneAndUpdate(
     {
-      id: userId,
+      email: email,
       role: role,
     },
     {
@@ -118,7 +118,7 @@ const refreshToken = async (token: string) => {
   const { userId, iat } = decoded;
 
   // checking if the user is exist
-  const user = await UserModel.isUserExisTByCustomId(userId);
+  const user = await UserModel.isUserExistByEmail(userId);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not exist');
   }
@@ -147,7 +147,7 @@ const refreshToken = async (token: string) => {
   //create token send to the client
 
   const jwtPayload = {
-    userId: user?.id,
+    email: user?.email,
     role: user?.role,
   };
 
@@ -162,8 +162,8 @@ const refreshToken = async (token: string) => {
   };
 };
 
-const forgotPassword = async (userId: string) => {
-  const user = await UserModel.isUserExisTByCustomId(userId);
+const forgotPassword = async (email: string) => {
+  const user = await UserModel.isUserExistByEmail(email);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not exist');
   }
@@ -180,7 +180,7 @@ const forgotPassword = async (userId: string) => {
   }
 
   const jwtPayload = {
-    userId: user?.id,
+    email: user?.email,
     role: user?.role,
   };
 
@@ -190,17 +190,17 @@ const forgotPassword = async (userId: string) => {
     '10m',
   );
 
-  const resetLink = `${config.reset_pass_uri_link}?id=${user?.id}&token=${refreshToken}`;
+  const resetLink = `${config.reset_pass_uri_link}?id=${user?.email}&token=${refreshToken}`;
   sendEmail(user.email, resetLink);
   return resetLink;
 };
 
 const resetPassword = async (
-  payload: { id: string; newPassword: string },
+  payload: { email: string; newPassword: string },
   token: string,
 ) => {
   // checking if the user is exist
-  const user = await UserModel.isUserExisTByCustomId(payload?.id);
+  const user = await UserModel.isUserExistByEmail(payload?.email);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not exist');
   }
@@ -228,7 +228,7 @@ const resetPassword = async (
 
   await UserModel.findOneAndUpdate(
     {
-      id: decoded.userId,
+      email: decoded.email,
       role: decoded.role,
     },
     {

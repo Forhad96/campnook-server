@@ -7,7 +7,7 @@ const userSchema = new Schema<TUser, UserStaticModel>(
     email: {
       type: String,
       required: true,
-      unique:true,
+      unique: true,
     },
     password: {
       type: String,
@@ -23,8 +23,8 @@ const userSchema = new Schema<TUser, UserStaticModel>(
     },
     role: {
       type: String,
-      enum: ['superAdmin', 'admin',"user"],
-      default:"user"
+      enum: ['superAdmin', 'admin', 'user'],
+      default: 'user',
     },
     status: {
       type: String,
@@ -58,8 +58,8 @@ userSchema.post('save', function (doc, next) {
   next();
 });
 
-userSchema.statics.isUserExisTByCustomId = async function (id: string) {
-  return await UserModel.findOne({ id }).select('+password');
+userSchema.statics.isUserExistByEmail = async function (email: string) {
+  return await UserModel.findOne({ email }).select('+password');
 };
 userSchema.statics.isPasswordMatched = async function (
   plainTextPassword: string,
@@ -72,7 +72,8 @@ userSchema.statics.isJWTIssuedBeforePasswordChanged = function (
   passwordChangedTimeStamp,
   jwtIssuedTimeStamp,
 ) {
-const passwordChangedTime = new Date(passwordChangedTimeStamp).getTime()/1000
+  const passwordChangedTime =
+    new Date(passwordChangedTimeStamp).getTime() / 1000;
 
   return passwordChangedTime > jwtIssuedTimeStamp;
 };

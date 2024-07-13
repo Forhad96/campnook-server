@@ -12,7 +12,7 @@ export interface TUser {
 }
 
 export interface UserStaticModel extends Model<TUser> {
-  isUserExisTByCustomId(id: string): Promise<TUser>;
+  isUserExistByEmail(email: string): Promise<TUser>;
 
   isPasswordMatched(
     plainTextPassword: string,
