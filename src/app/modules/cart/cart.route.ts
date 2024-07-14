@@ -4,8 +4,8 @@ import { CartControllers } from './cart.controller';
 const router = Router();
 
 router.post('/', CartControllers.handleAddToCart);
-router.patch('/:userId', CartControllers.handleUpdateCartItem);
-router.delete('/:userId/:productId', CartControllers.handleDeleteCartItem);
+router.patch('/:email', CartControllers.handleUpdateCartItem);
+router.delete('/:email/:productId', CartControllers.handleDeleteCartItem);
 
 router.get('/:email', CartControllers.handelGetUserCart);
 

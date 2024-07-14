@@ -14,9 +14,9 @@ const handleAddToCart = catchAsync(async (req, res) => {
   });
 });
 const handleUpdateCartItem = catchAsync(async (req, res) => {
-  const userId = req.params.userId;
+  const email = req.params.email;
   const cartItems = req.body;
-  const result = await CartServices.updateCartItem(userId, cartItems);
+  const result = await CartServices.updateCartItem(email, cartItems);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -25,9 +25,9 @@ const handleUpdateCartItem = catchAsync(async (req, res) => {
   });
 });
 const handleDeleteCartItem = catchAsync(async (req, res) => {
-  const { userId, productId } = req.params;
+  const { email, productId } = req.params;
 
-  const result = await CartServices.deleteCartItem(userId, productId);
+  const result = await CartServices.deleteCartItem(email, productId);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
