@@ -3,7 +3,7 @@ import { ICart, ICartItem, IWishlistItem } from './cart.interface';
 
 // Define the user wishlist Item Schema
 
-const wishlistItemSchem = new Schema<IWishlistItem>({
+const wishlistItemSchema = new Schema<IWishlistItem>({
   product: {
     type: Schema.Types.ObjectId,
     ref: 'Product',
@@ -36,7 +36,7 @@ const cartSchema = new Schema<ICart>(
       required: true,
     },
     items: [cartItemSchema],
-    wishlist:[wishlistItemSchem]
+    wishlist:[wishlistItemSchema]
   },
   {
     timestamps: true,
@@ -50,4 +50,4 @@ cartSchema.pre('save', function (next) {
 });
 
 // Create the Cart model
-export const CartModel = model('Cart', cartSchema);
+export const CartModel = model<ICart>('Cart', cartSchema);
