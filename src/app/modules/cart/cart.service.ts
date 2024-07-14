@@ -94,15 +94,7 @@ const addToCart = async (email: string, item: ICartItem) => {
 
 const updateCartItem = async (email: string, item: ICartItem) => {
   const { product: productId, quantity } = item;
-  // Validate user existence
-  const user = await UserModel.findOne({ email }).session(session);
-  if (!user) {
-    throw new AppError(
-      httpStatus.NOT_FOUND,
-      'User not found. Please register or log in.',
-    );
-  }
-  const userId = user?._id;
+
   // Validate positive quantity
   if (quantity <= 0) {
     throw new AppError(
@@ -117,13 +109,14 @@ const updateCartItem = async (email: string, item: ICartItem) => {
 
   try {
     // Validate user existence
-    const user = await UserModel.findById(userId).session(session);
+    const user = await UserModel.findOne({ email }).session(session);
     if (!user) {
       throw new AppError(
         httpStatus.NOT_FOUND,
         'User not found. Please register or log in.',
       );
     }
+    const userId = user?._id;
 
     // Validate product existence
     const product = await ProductModel.findById(productId).session(session);
@@ -188,6 +181,26 @@ const updateCartItem = async (email: string, item: ICartItem) => {
   }
 };
 const getUserCart = async (email: string) => {
+  // Validate user existence
+  const user = await UserModel.findOne({ email });
+  if (!user) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      'User not found. Please register or log in.',
+    );
+  }
+  const userId = user._id;
+  const cart = await CartModel.findOne({ user: userId }).populate(
+    'items.product',
+  );
+
+  if (!cart) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Cart not found');
+  }
+
+  return cart;
+};
+const getUserWishlist = async (email: string) => {
   // Validate user existence
   const user = await UserModel.findOne({ email });
   if (!user) {
@@ -272,4 +285,5 @@ export const CartServices = {
   getUserCart,
   updateCartItem,
   deleteCartItem,
+  getUserWishlist
 };
