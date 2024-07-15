@@ -16,13 +16,18 @@ const auth = (...requiredUserRoles: TUserRoles[]) => {
       throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized!');
     }
 
-    // checking if the given token valid or not
-    const decoded = jwt.verify(
-      token,
-      config.jwt_access_secret as string,
-    ) as JwtPayload;
+    // checking if the given token is valid
+    let decoded: JwtPayload;
+    try {
+      decoded = jwt.verify(
+        token,
+        config.jwt_access_secret as string,
+      ) as JwtPayload;
+    } catch (err) {
+      return next(new AppError(httpStatus.UNAUTHORIZED, 'Invalid token!'));
+    }
 
-    const {email,role,iat} = decoded;
+    const { email, role, iat } = decoded;
 
     // checking if the user is exist
     const user = await UserModel.isUserExistByEmail(email);
@@ -41,13 +46,15 @@ const auth = (...requiredUserRoles: TUserRoles[]) => {
       throw new AppError(httpStatus.FORBIDDEN, 'This user is Blocked');
     }
 
-    if(user.passwordChangedAt && UserModel.isJWTIssuedBeforePasswordChanged(user.passwordChangedAt,iat as number)){
-            throw new AppError(
-              httpStatus.UNAUTHORIZED,
-              'You are not authorized',
-            );
+    if (
+      user.passwordChangedAt &&
+      UserModel.isJWTIssuedBeforePasswordChanged(
+        user.passwordChangedAt,
+        iat as number,
+      )
+    ) {
+      throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized');
     }
-
 
     if (requiredUserRoles && !requiredUserRoles.includes(role)) {
       throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized');
