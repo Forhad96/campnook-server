@@ -13,7 +13,7 @@ const getAllProducts = async (query: Record<string, unknown>) => {
     .filter()
     .sort()
     .pagination()
-    .fields();
+    .fields()
 
   const result = await productQuery.modelQuery;
   return result;
@@ -22,11 +22,15 @@ const getSingleProduct = (id: string) => {
   const result = ProductModel.findById(id);
   return result;
 };
-const updateProduct = async(id: string, payload: Partial<IProduct>) => {
-  const result =await ProductModel.findByIdAndUpdate(id, {...payload}, {
-    new: true, // Return the updated document
-    runValidators: true, // Ensure the update adheres to the schema
-  });
+const updateProduct = async (id: string, payload: Partial<IProduct>) => {
+  const result = await ProductModel.findByIdAndUpdate(
+    id,
+    { ...payload },
+    {
+      new: true, // Return the updated document
+      runValidators: true, // Ensure the update adheres to the schema
+    },
+  );
   return result;
 };
 

@@ -24,15 +24,35 @@ class QueryBuilder<T> {
     }
 
     return this;
-
-    //
   }
   //search method end
 
   filter() {
-    const queryObj = { ...this.query }; // copy
+    const queryObj = { ...this.query } as Record<string, unknown>; // copy
+
+    // Handle price range filtering
+    if (queryObj.minPrice || queryObj.maxPrice) {
+      const priceFilter: Record<string, number> = {};
+      if (queryObj.minPrice) {
+        priceFilter.$gte = queryObj.minPrice as number;
+      }
+      if (queryObj.maxPrice) {
+        priceFilter.$lte = queryObj.maxPrice as number;
+      }
+      queryObj.price = priceFilter;
+      // delete queryObj.minPrice;
+      // delete queryObj.maxPrice;
+    }
     //filtering functionality
-    const excludeFields = ['searchTerm', 'sort', 'page', 'limit', 'fields'];
+    const excludeFields = [
+      'searchTerm',
+      'sort',
+      'page',
+      'limit',
+      'fields',
+      'minPrice',
+      "maxPrice"
+    ];
     excludeFields.forEach(el => delete queryObj[el]);
 
     this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>);
@@ -63,6 +83,7 @@ class QueryBuilder<T> {
     this.modelQuery = this.modelQuery.select(fields);
     return this;
   }
+
   async countTotal() {
     const totalQueries = this.modelQuery.getFilter();
     const total = await this.modelQuery.model.countDocuments(totalQueries);
@@ -79,4 +100,5 @@ class QueryBuilder<T> {
   }
   // main bracket end
 }
+
 export default QueryBuilder;
