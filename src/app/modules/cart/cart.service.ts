@@ -5,6 +5,7 @@ import { CartModel } from './cart.model';
 import { UserModel } from '../user/user.model';
 import { ProductModel } from '../product/product.module';
 import { startSession } from 'mongoose';
+import IProduct from '../product/product.interface';
 
 const addToCart = async (email: string, item: ICartItem) => {
   const { product: productId, quantity } = item;
@@ -190,16 +191,28 @@ const getUserCart = async (email: string) => {
     );
   }
   const userId = user._id;
-  const cart = await CartModel.findOne({ user: userId }).populate(
-    'items.product',
-  );
+  const cart = await CartModel.findOne({ user: userId }).populate({
+    path: 'items.product',
+    model: 'Product', 
+  });
 
   if (!cart) {
     throw new AppError(httpStatus.NOT_FOUND, 'Cart not found');
   }
 
-  return cart;
+  // Calculate total price
+  const totalPrice = cart.items.reduce((total, item) => {
+    const product = item.product as IProduct; // Type assertion to handle populated product
+    return total + product.price * item.quantity;
+  }, 0);
+
+
+  // Add total price to the cart object
+  const cartWithTotal = { ...cart.toObject(), totalPrice };
+
+  return cartWithTotal;
 };
+
 const getUserWishlist = async (email: string) => {
   // Validate user existence
   const user = await UserModel.findOne({ email });
@@ -285,5 +298,5 @@ export const CartServices = {
   getUserCart,
   updateCartItem,
   deleteCartItem,
-  getUserWishlist
+  getUserWishlist,
 };
