@@ -32,11 +32,23 @@ const handelSingleProduct = catchAsync(async (req, res) => {
   });
 });
 const handelUpdateProduct = catchAsync(async (req, res) => {
-  const result = await ProductServices.updateProduct(req.params.productId, req.body);
+  const result = await ProductServices.updateProduct(
+    req.params.productId,
+    req.body,
+  );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Update Product successful',
+    data: result,
+  });
+});
+const handelDeleteProduct = catchAsync(async (req, res) => {
+  const result = await ProductServices.deleteProduct(req.params.productId);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: ' Product deleted successful',
     data: result,
   });
 });
@@ -45,5 +57,6 @@ export const ProductControllers = {
   handelCreateProduct,
   handelGetAllProduct,
   handelSingleProduct,
-  handelUpdateProduct
+  handelUpdateProduct,
+  handelDeleteProduct
 };

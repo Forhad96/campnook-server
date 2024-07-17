@@ -13,7 +13,7 @@ const getAllProducts = async (query: Record<string, unknown>) => {
     .filter()
     .sort()
     .pagination()
-    .fields()
+    .fields();
 
   const result = await productQuery.modelQuery;
   return result;
@@ -33,10 +33,15 @@ const updateProduct = async (id: string, payload: Partial<IProduct>) => {
   );
   return result;
 };
+const deleteProduct = async (id: string) => {
+  const result = await ProductModel.findByIdAndDelete(id);
+  return result;
+};
 
 export const ProductServices = {
   createProduct,
   getAllProducts,
   getSingleProduct,
   updateProduct,
+  deleteProduct,
 };

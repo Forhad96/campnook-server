@@ -7,7 +7,7 @@ import { UserServices } from './user.service';
 // 
 
 const handelCreateUser= catchAsync(async (req, res) => {
-  
+
 const result = await UserServices.createUser(req.body)
   sendResponse(res, {
     statusCode: httpStatus.OK,

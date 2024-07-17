@@ -5,9 +5,14 @@ import { ProductValidations } from './product.validator';
 
 const router = Router();
 
-router.post('/', validateRequest(ProductValidations.zCreateProductSchema), ProductControllers.handelCreateProduct);
-router.get('/',ProductControllers.handelGetAllProduct);
-router.get('/:productId',ProductControllers.handelSingleProduct);
-router.put('/:productId',ProductControllers.handelUpdateProduct);
+router.post(
+  '/',
+  validateRequest(ProductValidations.zCreateProductSchema),
+  ProductControllers.handelCreateProduct,
+);
+router.get('/', ProductControllers.handelGetAllProduct);
+router.get('/:productId', ProductControllers.handelSingleProduct);
+router.put('/:productId', ProductControllers.handelUpdateProduct);
+router.delete('/:productId', ProductControllers.handelDeleteProduct);
 
 export const ProductRoutes = router;
