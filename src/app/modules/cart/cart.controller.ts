@@ -26,7 +26,8 @@ const handleUpdateCartItem = catchAsync(async (req, res) => {
   });
 });
 const handleDeleteCartItem = catchAsync(async (req, res) => {
-  const { email, productId } = req.params;
+  const {  productId } = req.params;
+   const email = req.user.email;
 
   const result = await CartServices.deleteCartItem(email, productId);
   sendResponse(res, {

@@ -1,4 +1,4 @@
-import express, { Application, Request, Response } from 'express';
+import express, { Application } from 'express';
 import cors from 'cors';
 import globalErrorHandler from './app/middleware/globalErrorHandler';
 import notFound from './app/middleware/notFound';
@@ -9,28 +9,26 @@ const app: Application = express();
 
 //parser
 app.use(express.json());
-app.use(cookieParser())
-app.use(cors({ origin: ['http://localhost:5173'],credentials:true }));
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: ['https://campnook-client.vercel.app', 'http://localhost:5173'],
+    credentials: true,
+  }),
+);
 
 // application routes
 
-app.use('/api/v1',router)
+app.use('/api/v1', router);
 
+// const test = async (req: Request, res: Response) => {
+//   const a = 10;
+//   res.send(a);
+//   // Promise.reject()
+// };
 
-/**
- * Handles GET requests to the root endpoint.
- *
- * @param req - The request object.
- * @param res - The response object.
- */
-const test = async (req: Request, res: Response) => {
-  const a = 10;
-  res.send(a);
-  // Promise.reject()
-};
+// app.get('/', test);
 
-app.get('/', test);
-
-app.use(globalErrorHandler)
-app.use(notFound)
+app.use(globalErrorHandler);
+app.use(notFound);
 export default app;

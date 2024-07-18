@@ -12,7 +12,7 @@ router.patch(
   CartControllers.handleUpdateCartItem,
 );
 router.delete(
-  '/:email/:productId',
+  '/:productId',
   auth(USER_ROLES.user),
   CartControllers.handleDeleteCartItem,
 );
