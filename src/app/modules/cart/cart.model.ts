@@ -1,15 +1,6 @@
 import { model, Schema } from 'mongoose';
-import { ICart, ICartItem, IWishlistItem } from './cart.interface';
+import { ICart, ICartItem} from './cart.interface';
 
-// Define the user wishlist Item Schema
-
-const wishlistItemSchema = new Schema<IWishlistItem>({
-  product: {
-    type: Schema.Types.ObjectId,
-    ref: 'Product',
-    required: true,
-  },
-});
 
 
 // Define the Cart Item Schema
@@ -36,7 +27,6 @@ const cartSchema = new Schema<ICart>(
       required: true,
     },
     items: [cartItemSchema],
-    wishlist:[wishlistItemSchema]
   },
   {
     timestamps: true,
