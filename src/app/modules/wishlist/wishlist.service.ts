@@ -1,62 +1,53 @@
 import httpStatus from 'http-status';
 import AppError from '../../errors/AppError';
-import { UserModel } from '../user/user.model';
 import { WishlistModel } from './wishlist.model';
+import { ProductModel } from '../product/product.module';
 
 const addProductToWishlist = async (userId: string, productId: string) => {
-  const wishlist = await WishlistModel.findOne({ userId });
+    const isExistProduct = await ProductModel.findById(productId);
+    if (!isExistProduct) {
+      throw new AppError(
+        httpStatus.NOT_FOUND,
+        'Product is not exist on the database',
+      );
+    }
+  let wishlist = await WishlistModel.findOne({ userId });
+
+  if (wishlist && wishlist.products.includes(productId)) {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      'Product already exists in the wishlist',
+    );
+  }
 
   if (wishlist) {
-    // const existedWishlist = wishlist.products.find(pId =>pId === productId )
-    // if(existedWishlist) {
-    //   throw new AppError(httpStatus.CONFLICT,"Already exist in wishlist")
-    // }
     wishlist.products.push(productId);
-    await wishlist.save();
   } else {
-    await WishlistModel.create({ userId, products: [productId] });
+    wishlist = new WishlistModel({ userId, products: [productId] });
   }
-  return wishlist
+  await wishlist.save();
+  return wishlist;
 };
 
 const getMyWishlist = async (userId: string) => {
-
   const wishlist = await WishlistModel.findOne({ userId }).populate('products');
-  return wishlist ? wishlist.products : [];
+  return wishlist;
 };
-const removeProductFromWishlist = async (email: string, productId: string) => {
-  try {
-    // Find the user by email
-    const user = await UserModel.findOne({ email });
-    if (!user) {
-      throw new Error('User not found');
-    }
+const removeProductFromWishlist = async (userId: string, productId: string) => {
 
-    // Remove the product from the user's wishlist
-    const result = await WishlistModel.updateOne(
-      { user: user._id },
-      { $pull: { products: { product: productId } } },
-    );
+  const wishlist = await WishlistModel.findOne({ userId });
 
-    if (result.modifiedCount === 0) {
-      throw new Error('Product not found in wishlist or no changes made');
-    }
-
-    console.log(
-      `Product ${productId} has been removed from the wishlist for user with email ${email}.`,
-    );
-    return result;
-  } catch (error) {
-    console.error(
-      `Error removing product from wishlist for user with email ${email}:`,
-      error,
-    );
-    throw error;
+  if (!wishlist) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Wishlist not found for the user');
   }
+  // console.log(object);
+  wishlist.products = wishlist.products.filter(id => id.toString() !== productId);
+  await wishlist.save();
+  // return { message: 'Product removed from wishlist successfully' };
+  return wishlist;
 };
-
 export const wishlistServices = {
   addProductToWishlist,
-getMyWishlist,
+  getMyWishlist,
   removeProductFromWishlist,
 };

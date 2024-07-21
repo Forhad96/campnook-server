@@ -14,7 +14,7 @@ const handelCreateWishlist = catchAsync(async (req, res) => {
   });
 });
 const handelGetMyWishlist = catchAsync(async (req, res) => {
-  const { userId} = req.params;
+  const { userId } = req.params;
   const result = await wishlistServices.getMyWishlist(userId);
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -23,8 +23,22 @@ const handelGetMyWishlist = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const handelRemoveProductFromWishlist = catchAsync(async (req, res) => {
+  const { userId, productId } = req.body;
+  const result = await wishlistServices.removeProductFromWishlist(
+    userId,
+    productId,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: ' Product removed from wishlist successfully',
+    data: result,
+  });
+});
 
 export const WishlistController = {
   handelCreateWishlist,
-  handelGetMyWishlist
+  handelGetMyWishlist,
+  handelRemoveProductFromWishlist,
 };
