@@ -14,8 +14,8 @@ const handelCreateWishlist = catchAsync(async (req, res) => {
   });
 });
 const handelGetMyWishlist = catchAsync(async (req, res) => {
-  const { userId } = req.params;
-  const result = await wishlistServices.getMyWishlist(userId);
+  const { email } = req.user
+  const result = await wishlistServices.getMyWishlist(email);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
