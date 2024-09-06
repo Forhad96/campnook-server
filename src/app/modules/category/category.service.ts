@@ -6,7 +6,13 @@ const addCategory = (payload: ICategory) => {
 
   return result;
 };
+const getAllCategory = () => {
+  const result = CategoryModel.find();
+
+  return result;
+};
 
 export const CategoryServices = {
   addCategory,
+  getAllCategory,
 };

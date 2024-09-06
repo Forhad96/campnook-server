@@ -14,9 +14,21 @@ const handleAddCategory = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const handleGetAllCategory = catchAsync(async (req, res) => {
+
+  const result = await CategoryServices.getAllCategory();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'All category retrieves successfully',
+    data: result,
+  });
+});
 
 
 
 export const CategoryController ={
-handleAddCategory
+handleAddCategory,
+handleGetAllCategory
+
 }

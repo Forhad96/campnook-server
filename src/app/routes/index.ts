@@ -28,7 +28,7 @@ const moduleRoutes = [
     route: CartRoutes,
   },
   {
-    path: '/category',
+    path: '/categories',
     route: CategoryRoutes,
   },
   {
